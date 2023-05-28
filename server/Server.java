@@ -1,10 +1,12 @@
 package server;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+
 public class Server {
     public static void main(String[] args) {
         final int port = 1234;
@@ -12,7 +14,7 @@ public class Server {
 
         try {
             serverSocket = new ServerSocket(port);
-            System.out.println("Servidor aguardando conexões...");
+            System.out.println("Server waiting for connections...");
 
             int playerCount = 0;
 
@@ -20,10 +22,14 @@ public class Server {
                 Socket clientSocket = serverSocket.accept();
                 playerCount++;
 
-                System.out.println("Jogador " + playerCount + " conectado.");
+                System.out.println("Player " + playerCount + " connected.");
 
                 GameThread gameThread = new GameThread(clientSocket, playerCount);
                 gameThread.start();
+
+                if (playerCount == 2) {
+                    playerCount = 0;
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -44,6 +50,10 @@ class GameThread extends Thread {
     private int playerNumber;
     private BufferedReader reader;
     private PrintWriter writer;
+    private static Object lock = new Object();
+    private static boolean playersReady = false;
+    private static int player1Choice;
+    private static int player2Choice;
 
     public GameThread(Socket clientSocket, int playerNumber) {
         this.clientSocket = clientSocket;
@@ -56,50 +66,80 @@ class GameThread extends Thread {
             reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             writer = new PrintWriter(clientSocket.getOutputStream(), true);
 
-            writer.println("Bem-vindo ao jogo Pedra, Papel e Tesoura!");
+            if (playerNumber == 1) {
+                writer.println("Waiting for another player to connect...");
+            }
 
-            // Aguarda a escolha do jogador
-            while (true) {
-                String choice = reader.readLine();
-
-                if (choice != null) {
-                    int playerSelection = Integer.parseInt(choice);
-
-                    int result = calculateResult(playerSelection);
-
-                    writer.println("Resultado: " + getResultMessage(result));
-
-                    break;
+            synchronized (lock) {
+                if (playerNumber == 2) {
+                    playersReady = true;
+                    lock.notifyAll();
+                } else {
+                    while (!playersReady) {
+                        lock.wait();
+                    }
                 }
             }
 
-            // Encerra a conexão
+            writer.println("Choose an option: [1] Rock [2] Paper [3] Scissors");
+            int choice = Integer.parseInt(reader.readLine());
+
+            if (playerNumber == 1) {
+                player1Choice = choice;
+            } else {
+                player2Choice = choice;
+            }
+
+            synchronized (lock) {
+                if (playerNumber == 1) {
+                    while (player2Choice == 0) {
+                        lock.wait();
+                    }
+                } else {
+                    while (player1Choice == 0) {
+                        lock.wait();
+                    }
+                }
+
+                calculateResult();
+
+                player1Choice = 0;
+                player2Choice = 0;
+                playersReady = false;
+                lock.notifyAll();
+            }
+
             clientSocket.close();
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private int calculateResult(int playerSelection) {
-        // Implemente a lógica para calcular o resultado do jogo
-        // Você pode seguir as regras mencionadas anteriormente
+    private void calculateResult() {
+        int result;
 
-        // Exemplo: sempre retorna 1 (vence) para o jogador 1 e 2 (perde) para o jogador 2
-        if (playerNumber == 1) {
-            return 1;
+        if (player1Choice == player2Choice) {
+            result = 0; // Draw
+        } else if ((player1Choice == 1 && player2Choice == 3) ||
+                (player1Choice == 2 && player2Choice == 1) ||
+                (player1Choice == 3 && player2Choice == 2)) {
+            result = 1; // Player 1 wins
         } else {
-            return 2;
+            result = 2; // Player 2 wins
+        }
+
+        if (playerNumber == 1) {
+            writer.println(getResultMessage(result));
         }
     }
 
     private String getResultMessage(int result) {
-        // Implemente a lógica para gerar a mensagem de resultado do jogo
-
-        // Exemplo: mensagem fixa
-        if (result == 1) {
-            return "Você venceu!";
+        if (result == 0) {
+            return "It's a draw!";
+        } else if (result == 1) {
+            return "You win!";
         } else {
-            return "Você perdeu!";
+            return "You lose!";
         }
     }
 }
