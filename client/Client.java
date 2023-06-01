@@ -8,26 +8,26 @@ import java.net.Socket;
 
 public class Client {
     public static void main(String[] args) {
+        Socket socket = null;
+        BufferedReader in = null;
+        PrintStream out = null;
+        BufferedReader consin = null;
         try {
-            //start do client
-            Socket socket = new Socket("localhost", 3333);
-
-            //declaracao de in e out do client
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintStream out = new PrintStream(socket.getOutputStream(), true);
-
-            //declaracao do envio de mensagem pelo client
+            socket = new Socket("localhost", 3333);
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            out = new PrintStream(socket.getOutputStream(), true);
             String message = in.readLine();
             System.out.println(message);
-
-            //leitura do que o usuario digitar.
-            BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
+            consin = new BufferedReader(new InputStreamReader(System.in));
             while (true) {
-            }
-            //in.close();
-            //out.close();
-            //socket.close();
-        } catch (IOException e) {
+        }
+        //in.close();
+        //out.close();
+       // socket.close();
+       // consin.close();
+       // System.out.println("Obrigado por jogar!!");
+       // System.exit(0);
+    }catch (IOException e) {
             e.printStackTrace();
         }
     }
