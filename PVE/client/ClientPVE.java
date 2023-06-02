@@ -17,7 +17,7 @@ public class ClientPVE {
 
             while (true) {
 
-                System.out.println("Digite [1] para pedra, [2] para papel, e [3] para tesoura.");
+                System.out.println("Digite [1] para pedra, [2] para papel, [3] para tesoura e [4] para sair.");
                 String pc = sc.nextLine();
 
                 out.println(pc);

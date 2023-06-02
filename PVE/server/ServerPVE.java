@@ -49,7 +49,7 @@ public class ServerPVE {
                     out.print(res);
                     ew++;
                 } else if (res.equals("Empate")){
-                    out.print("Empate! Tente novamente.");
+                    out.print("Empate! Tente novamente");
                 }
                 else if (res.equals("caractere invalido")){
                     out.print("Digite um caractere válido");
