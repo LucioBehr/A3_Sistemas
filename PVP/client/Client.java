@@ -18,14 +18,13 @@ public class Client {
             String message = in.readLine();
             System.out.println(message);
             consin = new BufferedReader(new InputStreamReader(System.in));
+            
             while (true) {
                 String esc = consin.readLine();
                 out.println(esc);
                 String serverResp = in.readLine();
                 System.out.println(serverResp);
-                if (serverResp.equals("Vitória do Jogador 1") || serverResp.equals("Vitória do Jogador 2") || serverResp.equals("Empate") ||
-                serverResp.equals("Valor Digitado pelo player 1 e 2 inválidos") || serverResp.equals("Valor Digitado pelo player 1 inválido") ||
-                serverResp.equals("Valor digitado pelo player 2 inválido")) {
+                if (serverResp.equals("Saindo do jogo.")){
                     break;
                 }
         }
@@ -35,6 +34,7 @@ public class Client {
         consin.close();
         System.out.println("Obrigado por jogar!!");
         System.exit(0);
+    
     }catch (IOException e) {
             e.printStackTrace();
         }
