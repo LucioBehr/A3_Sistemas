@@ -1,0 +1,6 @@
+# A3_Sistemas
+
+Lúcio de Lima Behr 12522226090
+Leonardo Lopes de Almeida 12522180905
+Lucas Benini de Andrade 125111364047
+LEONARDO D LUKA CARVALHO LEITE 12523162964
